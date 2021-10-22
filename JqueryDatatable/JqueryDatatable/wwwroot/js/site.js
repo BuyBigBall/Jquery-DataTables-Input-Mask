@@ -9,25 +9,44 @@ $(document).ready(function () {
             label: "Name:",
             name: "name"
         }, {
-            label: "East:",
-            name: "east",
-            attr: {
-                placeholder: "000000.00"
+                label: "East:",
+                name: "east",
+                attr: {
+                    placeholder: "000000.00"
+                }
+            }, {
+                label: "Number:",
+                name: "tnumber",
+                //setFormatter: function (val) {
+                //    /*return (Math.round(val * 100) / 100).toFixed(2);*/
+                //    return Number(val).toFixed(2);
+                //},
+                attr: {
+                    placeholder: "0000.00",
+                    type: "number",
+                    step: "1.00",
+                    autocomplete: "off"
+                }
+            }, {
+                label: "East 1:",
+                name: "east1",
+                attr: {
+                    placeholder: "000000.00"
+                }
+            }, {
+                label: "Number 1:",
+                name: "tnumber1",
+                //setFormatter: function (val) {
+                //    /*return (Math.round(val * 100) / 100).toFixed(2);*/
+                //    return Number(val).toFixed(2);
+                //},
+                attr: {
+                    placeholder: "0000.00",
+                    type: "number",
+                    step: "1.00",
+                    autocomplete: "off"
+                }
             }
-        }, {
-            label: "Number:",
-            name: "tnumber",
-            //setFormatter: function (val) {
-            //    /*return (Math.round(val * 100) / 100).toFixed(2);*/
-            //    return Number(val).toFixed(2);
-            //},
-            attr: {
-                placeholder: "0000.00",
-                type: "number",
-                step: "1.00",
-                autocomplete: "off"
-            }
-        }
         ]
     });
 
@@ -43,11 +62,8 @@ $(document).ready(function () {
 
     editor.on('open', function (e, mode, action) {
 
-        var strHidden = "<input id='hInsteedNum' style='display:none' value='' />";
-        this.field('tnumber').input().parent().append(strHidden);
-
-
         this.field('tnumber').input().addClass('tnumber');
+        this.field('tnumber1').input().addClass('tnumber');
         //$('.tnumber').mask('0000.00', {
         //    translation: {
         //        '0': {
@@ -58,6 +74,7 @@ $(document).ready(function () {
 
 
         // ###################### ---> validation start
+        this.field('east1').input().addClass('east');
         this.field('east').input().addClass('east');
         $('.east').mask('000000.00', {
             translation: {
@@ -112,7 +129,10 @@ $(document).ready(function () {
 
         }
         var inputCompleteTimer = null;
+        var tnumberLastCtrl = null;
+
         this.field('tnumber').input().addClass('tnumber');
+        this.field('tnumber1').input().addClass('tnumber');
         $('.tnumber').keyup(function (e) {
 
             console.log(number_cursor_position);
@@ -124,43 +144,37 @@ $(document).ready(function () {
                 this.value = val_array[0] + '.' + val_array[1].substr(0, 2);
             }
 
-
+            tnumberLastCtrl = e.target;
 
             if (isNaN(cellText)) cellText = "0.00";
 
 
             if ($(this).val().length == 0) number_cursor_position = 0;
-            if (e.keyCode == 190 || e.keyCode == 110) {
-                $("#hInsteedNum").val(cellText + '.');
-            }
-            else {
-                $("#hInsteedNum").val(cellText);
-            }
+
             keydownflag = false;
-            //$('.tnumber').trigger('input propertychange');      //this contain timer handler for '.00'
 
             if (inputCompleteTimer != null) {
                 clearTimeout(inputCompleteTimer);
             }
             inputCompleteTimer = setTimeout(function () {
-                        var cellText = $('.tnumber').val();
+                var cellText = $(tnumberLastCtrl).val();
                         var val_array = cellText.split('.')
                         if (val_array.length == 1 && val_array[0].length > 0) {
                             if (point_details != '')
-                                $('.tnumber').val(val_array[0] + '.' + point_details)
+                                $(tnumberLastCtrl).val(val_array[0] + '.' + point_details)
                             else
-                                $('.tnumber').val(val_array[0] + '.00')
+                                $(tnumberLastCtrl).val(val_array[0] + '.00')
                         }
                         else if (val_array.length == 0 || val_array.length == 1 && val_array[0].length == 0) {
-                            $('.tnumber').val('0.00')
+                            $(tnumberLastCtrl).val('0.00')
                         } else {
                             if (val_array[1].length == 1)
-                                $('.tnumber').val(cellText + '0')
+                                $(tnumberLastCtrl).val(cellText + '0')
                             else if (val_array[1].length == 0)
-                                $('.tnumber').val(cellText + '00')
+                                $(tnumberLastCtrl).val(cellText + '00')
                         }
 
-                        number_cursor_position = $('.tnumber').val().length;
+                number_cursor_position = $(tnumberLastCtrl).val().length;
 
                         return CheckIsavailableBuddon(e);
 
@@ -180,26 +194,29 @@ $(document).ready(function () {
             if (inputCompleteTimer != null) {
                 clearTimeout(inputCompleteTimer);
             }
+
+            tnumberLastCtrl = e.target;
+
             if (!keydownflag) {
                 inputCompleteTimer = setTimeout(function () {
-                    var cellText = $('.tnumber').val();
+                    var cellText = $(tnumberLastCtrl).val();
                     var val_array = cellText.split('.')
                     if (val_array.length == 1 && val_array[0].length > 0) {
                         if (point_details != '')
-                            $('.tnumber').val(val_array[0] + '.' + point_details)
+                            $(tnumberLastCtrl).val(val_array[0] + '.' + point_details)
                         else
-                            $('.tnumber').val(val_array[0] + '.00')
+                            $(tnumberLastCtrl).val(val_array[0] + '.00')
                     }
                     else if (val_array.length == 0 || val_array.length == 1 && val_array[0].length == 0) {
-                        $('.tnumber').val('0.00')
+                        $(tnumberLastCtrl).val('0.00')
                     } else {
                         if (val_array[1].length == 1)
-                            $('.tnumber').val(cellText + '0')
+                            $(tnumberLastCtrl).val(cellText + '0')
                         else if (val_array[1].length == 0)
-                            $('.tnumber').val(cellText + '00')
+                            $(tnumberLastCtrl).val(cellText + '00')
                     }
 
-                    number_cursor_position = $('.tnumber').val().length;
+                    number_cursor_position = $(tnumberLastCtrl).val().length;
 
                     return CheckIsavailableBuddon(e);
                 },
@@ -213,31 +230,31 @@ $(document).ready(function () {
             if (e.offsetX <= 15) number_cursor_position = 0;
             else if (e.offsetX <= 27) {
                 number_cursor_position = 1;
-                if (number_cursor_position > $('.tnumber').val().length) number_cursor_position = $('.tnumber').val().length;
+                if (number_cursor_position > $(this).val().length) number_cursor_position = $(this).val().length;
             }
             else if (e.offsetX <= 35) {
                 number_cursor_position = 2;
-                if (number_cursor_position > $('.tnumber').val().length) number_cursor_position = $('.tnumber').val().length;
+                if (number_cursor_position > $(this).val().length) number_cursor_position = $(this).val().length;
             }
             else if (e.offsetX <= 43) {
                 number_cursor_position = 3;
-                if (number_cursor_position > $('.tnumber').val().length) number_cursor_position = $('.tnumber').val().length;
+                if (number_cursor_position > $(this).val().length) number_cursor_position = $(this).val().length;
             }
             else if (e.offsetX <= 50) {
                 number_cursor_position = 4;
-                if (number_cursor_position > $('.tnumber').val().length) number_cursor_position = $('.tnumber').val().length;
+                if (number_cursor_position > $(this).val().length) number_cursor_position = $(this).val().length;
             }
             else if (e.offsetX <= 55) {
                 number_cursor_position = 5;
-                if (number_cursor_position > $('.tnumber').val().length) number_cursor_position = $('.tnumber').val().length;
+                if (number_cursor_position > $(this).val().length) number_cursor_position = $(this).val().length;
             }
             else if (e.offsetX <= 63) {
                 number_cursor_position = 6;
-                if (number_cursor_position > $('.tnumber').val().length) number_cursor_position = $('.tnumber').val().length;
+                if (number_cursor_position > $(this).val().length) number_cursor_position = $(this).val().length;
             }
             else if (e.offsetX <= 1000) {
                 number_cursor_position = 7;
-                if (number_cursor_position > $('.tnumber').val().length) number_cursor_position = $('.tnumber').val().length;
+                if (number_cursor_position > $(this).val().length) number_cursor_position = $(this).val().length;
             }
         });
 
@@ -263,10 +280,6 @@ $(document).ready(function () {
                     }
                 }
 
-                //at point next position
-                //if ($("#hInsteedNum").val().length > $(this).val().length) {            
-                //    number_cursor_position = $("#hInsteedNum").val().length;
-                //}
 
                 // at point position
                 if (e.keyCode == 190 || e.keyCode == 110) {
@@ -351,10 +364,10 @@ $(document).ready(function () {
                     number_cursor_position--; if (number_cursor_position < 0) number_cursor_position = 0;
                 }
                 if (e.keyCode == 39) {
-                    number_cursor_position++; if (number_cursor_position > $('.tnumber').val().length) number_cursor_position = $('.tnumber').val().length;
+                    number_cursor_position++; if (number_cursor_position > $(this).val().length) number_cursor_position = $(this).val().length;
                 }
                 if (e.keyCode == 36) number_cursor_position = 0;
-                if (e.keyCode == 35) number_cursor_position = $('.tnumber').val().length;
+                if (e.keyCode == 35) number_cursor_position = $(this).val().length;
 
                 if (e.keyCode != 37 &&  //left
                     e.keyCode != 39 &&  //right
@@ -383,13 +396,13 @@ $(document).ready(function () {
         });
 
         var eastChangeTimer = null;
-
+        var eastLastInputCtrl = null;
         this.field('east').input().addClass('east');
         $('.east').keyup(function (e) {
             if (eastChangeTimer != null) {
                 clearTimeout(eastChangeTimer);
             }
-
+            eastLastInputCtrl = e.target;
             CheckIsavailableBuddon(e);
 
             var cellText = $(this).val();
@@ -398,15 +411,15 @@ $(document).ready(function () {
                         if (val_array[0].length >= 6) {
 
                             if (val_array.length == 1 && val_array[0].length > 0) {
-                                $('.east').val(val_array[0] + '.00')
+                                $(eastLastInputCtrl).val(val_array[0] + '.00')
                             }
                             else if (val_array.length == 0 || val_array.length == 1 && val_array[0].length == 0) {
-                                $('.east').val('0.00')
+                                $(eastLastInputCtrl).val('0.00')
                             } else {
                                 if (val_array[1].length == 1)
-                                    $('.east').val(cellText + '0')
+                                    $(eastLastInputCtrl).val(cellText + '0')
                                 else if (val_array[1].length == 0)
-                                    $('.east').val(cellText + '00')
+                                    $(eastLastInputCtrl).val(cellText + '00')
                             }
                         }
 
@@ -528,6 +541,16 @@ $(document).ready(function () {
                 render: $.fn.dataTable.render.number('', '.', 2),
                 className: "dt-center"
             },
+            {
+                data: "east1",
+                render: $.fn.dataTable.render.number('', '.', 2),
+                className: "dt-center"
+            },
+            {
+                data: "tnumber1",
+                render: $.fn.dataTable.render.number('', '.', 2),
+                className: "dt-center"
+            },
         ],
         select: true,
         language: {
@@ -548,10 +571,10 @@ $(document).ready(function () {
         .appendTo($('.col-md-6:eq(0)', table.table().container()));
 
     function CheckIsavailableBuddon(e) {
-        if ($(".east").val().length < 9 || $(".tnumber").val().length < 4) {    // tnumber value minimum (0.00)
+        if ($(eastLastInputCtrl).val().length < 9 || $(tnumberLastCtrl).val().length < 4) {    // tnumber value minimum (0.00)
             e.preventDefault();
-            if ($(".east").val().length < 9) $('.east').focus();
-            if ($(".tnumber").val().length < 4) $(".tnumber").focus();
+            if ($(eastLastInputCtrl).val().length < 9) $(eastLastInputCtrl).focus();
+            if ($(tnumberLastCtrl).val().length < 4) $(tnumberLastCtrl).focus();
             $(".DTE_Form_Buttons button").addClass("disabled");
             $(".DTE_Form_Buttons button").prop("disabled", true);
             return false;
